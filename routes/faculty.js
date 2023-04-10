@@ -101,4 +101,105 @@ router.post(
   }
 );
 
+/**
+ * @swagger
+ * /faculty/myprofile:
+ *  get:
+ *    description: Get faculty profile
+ *    parameters:
+ *    - name: authorization
+ *      description: authorization token
+ *      required: true
+ *      in: header
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Faculty profile
+ *      400:
+ *        description: Error getting faculty profile
+ *      500:
+ *        description: Error getting faculty profile
+ *
+ */
+
+router.get('/myprofile', deserializeUser, isFaculty, async (req, res) => {
+  log.info('GET /faculty/myprofile');
+  try {
+    const faculty = await Faculty.findById(req.user._id).select('-password');
+    if (!faculty) {
+      return res.status(400).json({
+        message: 'Faculty not found',
+      });
+    }
+    return res.status(200).json({
+      message: 'Faculty profile',
+      faculty,
+    });
+  } catch (err) {
+    log.error(err);
+    return res.status(500).json({
+      message: 'Error getting faculty profile',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /faculty/profile/student/{id}:
+ *  get:
+ *    description: Get student profile
+ *    parameters:
+ *    - name: authorization
+ *      description: authorization token
+ *      required: true
+ *      in: header
+ *      type: string
+ *    - name: id
+ *      description: student id
+ *      required: true
+ *      in: path
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Student profile
+ *      400:
+ *        description: Error getting student profile
+ *      500:
+ *        description: Error getting student profile
+ *      404:
+ *        description: Student not found
+ *      401:
+ *        description: Unauthorized
+ *      403:
+ *        description: Forbidden
+ */
+
+router.get(
+  '/profile/student/:id',
+  deserializeUser,
+  isFaculty,
+  async (req, res) => {
+    log.info('GET /faculty/profile/student/:id');
+    try {
+      const student = await Students.findById(req.params.id).select(
+        '-password'
+      );
+      if (!student) {
+        return res.status(404).json({
+          message: 'Student not found',
+        });
+      }
+      return res.status(200).json({
+        message: 'Student profile',
+        student,
+      });
+    } catch (err) {
+      log.error(err);
+      return res.status(500).json({
+        message: 'Error getting student profile',
+      });
+    }
+  }
+);
+
 module.exports = router;
