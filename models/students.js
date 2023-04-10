@@ -27,6 +27,10 @@ const StudentsSchema = new schema(
       type: String,
       required: true,
     },
+    department: {
+      type: String,
+      required: true,
+    },
     attendance: [
       {
         subject: String,

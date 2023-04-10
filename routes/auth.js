@@ -3,6 +3,7 @@ const log = require('../log');
 const Faculty = require('../models/faculty');
 const validate = require('../middleware/validateRequest');
 const { SignupSchema, LoginSchema } = require('../schema/auth.schema');
+const Students = require('../models/students');
 const router = express.Router();
 
 /**
