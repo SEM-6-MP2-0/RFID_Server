@@ -205,9 +205,9 @@ router.get(
 
 /**
  * @swagger
- * /faculty/markattendance:
+ * /faculty/takeattendance:
  *  post:
- *    description: Mark attendance of a class
+ *    description: take attendance of a class
  *    parameters:
  *    - name: authorization
  *      description: authorization token
@@ -226,11 +226,11 @@ router.get(
  *      type: string
  *    responses:
  *      200:
- *        description: Attendance marked successfully
+ *        description: Attendance taked successfully
  *      400:
- *        description: Error marking attendance
+ *        description: Error taking attendance
  *      500:
- *        description: Error marking attendance
+ *        description: Error taking attendance
  *      404:
  *        description: Student not found
  *      401:
@@ -239,8 +239,8 @@ router.get(
  *        description: Forbidden
  */
 
-router.post('/markattendance', deserializeUser, isFaculty, async (req, res) => {
-  log.info('POST /faculty/markattendance');
+router.post('/takeattendance', deserializeUser, isFaculty, async (req, res) => {
+  log.info('POST /faculty/takeattendance');
   try {
     const faculty = await Faculty.findById(req.user._id);
     if (!faculty) {
@@ -278,15 +278,102 @@ router.post('/markattendance', deserializeUser, isFaculty, async (req, res) => {
       attendance.push(attendanceObj);
     }
     console.log(attendance);
-    // await Attendance.insertMany(attendance);
     return res.status(200).json({
-      message: 'Attendance marked successfully',
+      message: 'Attendance taked successfully',
       attendance,
     });
   } catch (err) {
     log.error(err);
     return res.status(500).json({
-      message: 'Error marking attendance',
+      message: 'Error taking attendance',
+    });
+  }
+});
+
+/**
+ * @swagger
+ * /faculty/saveattendance:
+ *  post:
+ *    description: Save attendance of a class
+ *    parameters:
+ *    - name: authorization
+ *      description: authorization token
+ *      required: true
+ *      in: header
+ *      type: string
+ *    - name: attendance
+ *      description: attendance
+ *      required: true
+ *      in: formData
+ *      type: string
+ *    - name: subject
+ *      description: subject
+ *      required: true
+ *      in: formData
+ *      type: string
+ *    - name: semester
+ *      description: semester
+ *      required: true
+ *      in: formData
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Attendance saved successfully
+ *      400:
+ *        description: Error saving attendance
+ *      500:
+ *        description: Error saving attendance
+ *      404:
+ *        description: Student not found
+ *      401:
+ *        description: Unauthorized
+ *      403:
+ *        description: Forbidden
+ */
+
+router.post('/saveattendance', deserializeUser, isFaculty, async (req, res) => {
+  log.info('POST /faculty/saveattendance');
+  try {
+    const faculty = await Faculty.findById(req.user._id);
+    if (!faculty) {
+      return res.status(400).json({
+        message: 'Faculty not found',
+      });
+    }
+    const { attendance, subject, semester } = req.body;
+    const attendanceObj = JSON.parse(attendance);
+    const attendanceArr = [];
+    for (let i = 0; i < attendanceObj.length; i++) {
+      const attendance = attendanceObj[i];
+      const newattendanceObj = {
+        student: attendance.student,
+        attended: attendance.isPresent,
+        subject: subject,
+        semester: semester,
+        prn: attendance.prn,
+      };
+      attendanceArr.push(newattendanceObj);
+    }
+    console.log(attendanceArr);
+    // push into student attendance
+    for (stud of attendanceArr) {
+      const student = await Students.findById(stud.student);
+      if (!student) {
+        return res.status(404).json({
+          message: 'Student not found',
+        });
+      }
+      student.attendance.push(stud);
+      await student.save();
+    }
+
+    return res.status(200).json({
+      message: 'Attendance saved successfully',
+    });
+  } catch (err) {
+    log.error(err);
+    return res.status(500).json({
+      message: 'Error saving attendance',
     });
   }
 });
