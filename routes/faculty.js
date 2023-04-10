@@ -203,4 +203,92 @@ router.get(
   }
 );
 
+/**
+ * @swagger
+ * /faculty/markattendance:
+ *  post:
+ *    description: Mark attendance of a class
+ *    parameters:
+ *    - name: authorization
+ *      description: authorization token
+ *      required: true
+ *      in: header
+ *      type: string
+ *    - name: dateofleaving
+ *      description: date of leaving
+ *      required: true
+ *      in: formData
+ *      type: string
+ *    - name: department
+ *      description: department
+ *      required: true
+ *      in: formData
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Attendance marked successfully
+ *      400:
+ *        description: Error marking attendance
+ *      500:
+ *        description: Error marking attendance
+ *      404:
+ *        description: Student not found
+ *      401:
+ *        description: Unauthorized
+ *      403:
+ *        description: Forbidden
+ */
+
+router.post('/markattendance', deserializeUser, isFaculty, async (req, res) => {
+  log.info('POST /faculty/markattendance');
+  try {
+    const faculty = await Faculty.findById(req.user._id);
+    if (!faculty) {
+      return res.status(400).json({
+        message: 'Faculty not found',
+      });
+    }
+    const { dateofleaving, department } = req.body;
+    const PRESENT_STUDENT_PRNS = [
+      '120A3043',
+      '120A3044',
+      '120A3045',
+      '120A3046',
+    ];
+    const students = await Students.find({
+      dateofleaving: dateofleaving,
+      department: department,
+    }).sort({ prn: 1 });
+    if (!students) {
+      return res.status(404).json({
+        message: 'Students not found',
+      });
+    }
+    const attendance = [];
+    for (let i = 0; i < students.length; i++) {
+      const student = students[i];
+      const isPresent = PRESENT_STUDENT_PRNS.includes(student.prn);
+      const attendanceObj = {
+        student: student._id,
+        date: new Date(),
+        isPresent: isPresent,
+        prn: student.prn,
+        name: student.name,
+      };
+      attendance.push(attendanceObj);
+    }
+    console.log(attendance);
+    // await Attendance.insertMany(attendance);
+    return res.status(200).json({
+      message: 'Attendance marked successfully',
+      attendance,
+    });
+  } catch (err) {
+    log.error(err);
+    return res.status(500).json({
+      message: 'Error marking attendance',
+    });
+  }
+});
+
 module.exports = router;
