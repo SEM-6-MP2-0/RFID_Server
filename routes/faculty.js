@@ -83,6 +83,7 @@ router.post(
           prn: row.getCell(2).value,
           email: row.getCell(5).value?.['text'] || row.getCell(5).value || '',
           dateofjoining: joinyear,
+          dateofleaving: parseInt(joinyear) + 4,
           department: department,
           password: await encryptPassword('Pass@123'),
         };

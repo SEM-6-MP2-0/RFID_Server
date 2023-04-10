@@ -27,6 +27,9 @@ const StudentsSchema = new schema(
       type: String,
       required: true,
     },
+    dateofleaving: {
+      type: String,
+    },
     department: {
       type: String,
       required: true,
