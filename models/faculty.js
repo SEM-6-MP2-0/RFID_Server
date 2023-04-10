@@ -30,6 +30,14 @@ const FacultySchema = new schema(
       type: Boolean,
       default: true,
     },
+    department: {
+      type: String,
+      required: true,
+    },
+    phone: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,
