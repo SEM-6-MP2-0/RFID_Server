@@ -1,0 +1,52 @@
+{
+  "name": "RFID_Server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/SEM-6-MP2-0/RFID_Server.git",
+  "author": "SalmanAd01 <salmanadhikari415@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon --legacy-watch server.js",
+    "lint": "eslint --plugin markdown --ext js,md .",
+    "fix": "eslint --fix --plugin markdown --ext js,md .",
+    "prittier": "prettier --write .",
+    "prepare": "husky install",
+    "test": "jest --testTimeout=10000"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.11.7",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.38.0",
+    "eslint-cli": "^1.1.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-jsx-a11y": "^6.7.1",
+    "eslint-plugin-markdown": "^3.0.0",
+    "eslint-plugin-react": "^7.32.2",
+    "express": "^4.18.2",
+    "husky": "^8.0.3",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^7.0.3",
+    "pino": "^8.11.0",
+    "pino-pretty": "^10.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^4.6.2",
+    "uuid": "^9.0.0",
+    "yup": "^1.0.2"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "husky": "^8.0.0",
+    "jest": "^29.5.0",
+    "nodemon": "^2.0.22",
+    "prettier": "^2.8.7",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
