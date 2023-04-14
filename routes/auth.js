@@ -4,6 +4,7 @@ const Faculty = require('../models/faculty');
 const validate = require('../middleware/validateRequest');
 const { SignupSchema, LoginSchema } = require('../schema/auth.schema');
 const Students = require('../models/students');
+const deserializeUser = require('../middleware/deserializeUser');
 const router = express.Router();
 
 /**
@@ -148,6 +149,35 @@ router.post('/login', validate(LoginSchema), async (req, res) => {
     return res.status(500).json({
       message: 'Error retrieving User',
     });
+  }
+});
+
+/**
+ * @swagger
+ * /auth/valid:
+ *  get:
+ *    description: Use to check if the token is valid
+ *    parameters:
+ *    - name: authorization
+ *      description: authorization token
+ *      required: true
+ *      in: header
+ *      type: string
+ *    responses:
+ *      200:
+ *        description: Token is valid
+ *      401:
+ *        description: Token is invalid
+ *      500:
+ *        description: Internal server error
+ */
+router.get('/valid', deserializeUser, async (req, res) => {
+  try {
+    log.info('GET /auth/valid');
+    return res.status(200).send({ message: 'Token is valid' });
+  } catch (e) {
+    log.error(e);
+    return res.status(500).send({ message: 'Internal server error' });
   }
 });
 
