@@ -72,8 +72,7 @@ router.post(
         if (
           !row.getCell(3).value ||
           !row.getCell(2).value ||
-          !row.getCell(5).value ||
-          !row.getCell(4).value
+          !row.getCell(5).value
         ) {
           console.log('Invalid row', row.getCell(3).value || '');
           continue;
@@ -224,6 +223,11 @@ router.get(
  *      required: true
  *      in: formData
  *      type: string
+ *    - name: dateofattendancetake
+ *      description: date of attendance take
+ *      required: true
+ *      in: formData
+ *      type: string
  *    responses:
  *      200:
  *        description: Attendance taked successfully
@@ -248,7 +252,7 @@ router.post('/takeattendance', deserializeUser, isFaculty, async (req, res) => {
         message: 'Faculty not found',
       });
     }
-    const { dateofleaving, department } = req.body;
+    const { dateofleaving, department, dateofattendancetake } = req.body;
     const PRESENT_STUDENT_PRNS = [
       '120A3043',
       '120A3044',
@@ -270,7 +274,7 @@ router.post('/takeattendance', deserializeUser, isFaculty, async (req, res) => {
       const isPresent = PRESENT_STUDENT_PRNS.includes(student.prn);
       const attendanceObj = {
         student: student._id,
-        date: new Date(),
+        date: dateofattendancetake || new Date(),
         isPresent: isPresent,
         prn: student.prn,
         name: student.name,
@@ -351,6 +355,7 @@ router.post('/saveattendance', deserializeUser, isFaculty, async (req, res) => {
         subject: subject,
         semester: semester,
         prn: attendance.prn,
+        createdAt: attendance.date,
       };
       attendanceArr.push(newattendanceObj);
     }
