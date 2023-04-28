@@ -7,6 +7,8 @@ const Students = require('../models/students');
 const upload = require('../utils/multer.utils');
 const router = express.Router();
 const excel = require('exceljs');
+const axios = require('axios');
+
 const { encryptPassword } = require('../utils/bcrypt.utils');
 
 /**
@@ -253,12 +255,22 @@ router.post('/takeattendance', deserializeUser, isFaculty, async (req, res) => {
       });
     }
     const { dateofleaving, department, dateofattendancetake } = req.body;
-    const PRESENT_STUDENT_PRNS = [
-      '120A3043',
-      '120A3044',
-      '120A3045',
-      '120A3046',
-    ];
+    var PRESENT_STUDENT_PRNS = [
+          '120A3043',
+          '120A3038',
+          '120A3027',
+          '120A3046',
+        ]
+    console.log("Taking RFID")
+    try{
+
+      const request = await axios.get(process.env.RFID_SERVER_NGROK);
+      PRESENT_STUDENT_PRNS = request.data.data
+    }
+    catch(err){
+      log.error("NOT REq")
+      log.error(err)
+    }
     const students = await Students.find({
       dateofleaving: dateofleaving,
       department: department,
@@ -281,7 +293,7 @@ router.post('/takeattendance', deserializeUser, isFaculty, async (req, res) => {
       };
       attendance.push(attendanceObj);
     }
-    console.log(attendance);
+    // console.log(attendance);
     return res.status(200).json({
       message: 'Attendance taked successfully',
       attendance,
